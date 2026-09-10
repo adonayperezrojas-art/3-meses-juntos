@@ -1,0 +1,451 @@
+/* ==========================================================================
+   1. VARIABLES GLOBALES Y RESET
+   ========================================================================== */
+:root {
+    --bg-color: #fdfbf7;
+    --amarillo-principal: #fcd34d;
+    --amarillo-oscuro: #f59e0b;
+    --amarillo-claro: #fef08a;
+    --amarillo-sobre: #fde047;
+    --texto-color: #374151;
+    --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--texto-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Canvas para flores y pétalos flotantes */
+#canvas-flores {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   2. CONTROL DE ESCENAS (PANTALLAS)
+   ========================================================================== */
+.escena {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+}
+
+.escena.oculta {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+    position: absolute;
+}
+
+.escena.activa {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+/* ==========================================================================
+   3. PANTALLA 1: SOBRE AMARILLO Y ANIMACIÓN 3D
+   ========================================================================== */
+.sobre-contenedor {
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.sobre {
+    width: 320px;
+    height: 220px;
+    background-color: var(--amarillo-sobre);
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(217, 119, 6, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.sobre-contenedor:hover .sobre {
+    transform: translateY(-5px) rotateX(5deg);
+    box-shadow: 0 20px 40px rgba(217, 119, 6, 0.3);
+}
+
+.sobre-fondo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #fef08a;
+    border-radius: 12px;
+}
+
+.papel-interior {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 80%;
+    background: #ffffff;
+    border-radius: 8px;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.solapa-izq {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 110px solid transparent;
+    border-bottom: 110px solid transparent;
+    border-left: 170px solid #fde047;
+    border-radius: 12px 0 0 12px;
+    z-index: 3;
+}
+
+.solapa-der {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 110px solid transparent;
+    border-bottom: 110px solid transparent;
+    border-right: 170px solid #fde047;
+    border-radius: 0 12px 12px 0;
+    z-index: 3;
+}
+
+.solapa-inf {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 160px solid transparent;
+    border-right: 160px solid transparent;
+    border-bottom: 120px solid #facc15;
+    border-radius: 0 0 12px 12px;
+    z-index: 4;
+}
+
+.solapa-sup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 160px solid transparent;
+    border-right: 160px solid transparent;
+    border-top: 125px solid #eab308;
+    transform-origin: top;
+    transition: transform 0.6s ease-in-out, z-index 0.2s ease-in-out;
+    z-index: 5;
+}
+
+.sello-cera {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, #f59e0b 0%, #d97706 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    z-index: 6;
+    transition: transform 0.3s ease;
+}
+
+.sobre-contenedor:hover .sello-cera {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.sobre.abierto .solapa-sup {
+    transform: rotateX(180deg);
+    z-index: 1;
+}
+
+.sobre.abierto .papel-interior {
+    transform: translate(-50%, -60px);
+}
+
+.indicacion {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    color: #b45309;
+    letter-spacing: 0.5px;
+    animation: flotar 2s infinite ease-in-out;
+}
+
+.nombre-destinatario {
+    font-size: 1.8rem;
+    color: #78350f;
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   4. PANTALLA 2: TARJETA / CARTA Y MARCO INTERNO
+   ========================================================================== */
+.tarjeta-mensaje {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 35px 30px;
+    box-shadow: var(--shadow-soft);
+    position: relative;
+    width: 100%;
+    max-width: 780px;
+    box-sizing: border-box;
+    min-height: auto;
+}
+
+/* Marco ajustado dentro de la tarjeta */
+.marco-flores {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.flor-emoji {
+    position: absolute;
+    font-size: 1.2rem;
+    user-select: none;
+    transform: translate(-50%, -50%);
+}
+
+/* Posicionamiento del borde de emojis */
+.f-t1 { top: 0; left: 5%; }
+.f-t2 { top: 0; left: 20%; }
+.f-t3 { top: 0; left: 35%; }
+.f-t4 { top: 0; left: 50%; }
+.f-t5 { top: 0; left: 65%; }
+.f-t6 { top: 0; left: 80%; }
+.f-t7 { top: 0; left: 95%; }
+
+.f-r1 { top: 25%; left: 100%; }
+.f-r2 { top: 50%; left: 100%; }
+.f-r3 { top: 75%; left: 100%; }
+.f-r4 { top: 95%; left: 100%; }
+
+.f-b1 { top: 100%; left: 5%; }
+.f-b2 { top: 100%; left: 20%; }
+.f-b3 { top: 100%; left: 35%; }
+.f-b4 { top: 100%; left: 50%; }
+.f-b5 { top: 100%; left: 65%; }
+.f-b6 { top: 100%; left: 80%; }
+.f-b7 { top: 100%; left: 95%; }
+
+.f-l1 { top: 25%; left: 0; }
+.f-l2 { top: 50%; left: 0; }
+.f-l3 { top: 75%; left: 0; }
+.f-l4 { top: 95%; left: 0; }
+
+/* Contenido Interno */
+.contenido-layout {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    position: relative;
+    z-index: 3;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.contenido-layout.cambiando {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.bloque-texto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.titulo-nombre {
+    font-size: 2rem;
+    color: #d97706;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.texto-carta {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4b5563;
+    min-height: 100px;
+    word-break: break-word;
+}
+
+.contenedor-foto {
+    width: 220px;
+    flex-shrink: 0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 4px solid #fef08a;
+    background-color: #fef08a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foto-vertical {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==========================================================================
+   5. BOTONES DE NAVEGACIÓN Y PAGINACIÓN
+   ========================================================================== */
+.navegacion-paginas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    position: relative;
+    z-index: 4;
+}
+
+.btn-nav {
+    background: #fef08a;
+    color: #b45309;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-nav:hover:not(:disabled) {
+    background: #fde047;
+    transform: scale(1.1);
+}
+
+.btn-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.indicador-pagina {
+    font-size: 0.9rem;
+    color: #d97706;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   6. MEDIA QUERIES (RESPONSIVE PARA MÓVILES)
+   ========================================================================== */
+@keyframes flotar {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@media (max-width: 680px) {
+    .contenido-layout {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+
+    .contenedor-foto {
+        width: 80%;
+        max-width: 240px;
+        margin: 0 auto;
+    }
+
+    .foto-vertical {
+        height: 240px;
+    }
+
+    .tarjeta-mensaje {
+        padding: 30px 20px;
+    }
+
+    .sobre {
+        width: 280px;
+        height: 190px;
+    }
+
+    .solapa-izq, .solapa-der {
+        border-top-width: 95px;
+        border-bottom-width: 95px;
+    }
+    
+    .solapa-izq { border-left-width: 148px; }
+    .solapa-der { border-right-width: 148px; }
+    
+    .solapa-inf {
+        border-left-width: 140px;
+        border-right-width: 140px;
+        border-bottom-width: 105px;
+    }
+    
+    .solapa-sup {
+        border-left-width: 140px;
+        border-right-width: 140px;
+        border-top-width: 110px;
+    }
+
+    .sello-cera {
+        top: 85px;
+    }
+
+    .flor-emoji {
+        font-size: 0.95rem;
+    }
+    
+    .marco-flores {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+    }
+}

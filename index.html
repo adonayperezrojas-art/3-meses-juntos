@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi Meloncito</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Canvas para flores y pétalos flotantes -->
+    <canvas id="canvas-flores"></canvas>
+
+    <!-- PANTALLA 1: SOBRE CERRADO CON ANIMACIÓN 3D -->
+    <div id="pantalla-sobre" class="escena activa">
+        <div class="sobre-contenedor" id="btn-abrir">
+            <div class="sobre" id="sobre">
+                <div class="sobre-fondo"></div>
+                <div class="papel-interior"></div>
+                <div class="solapa-izq"></div>
+                <div class="solapa-der"></div>
+                <div class="solapa-inf"></div>
+                <div class="solapa-sup"></div>
+                <div class="sello-cera" id="sello">🌻</div>
+            </div>
+        </div>
+        <p class="indicacion">Toca el girasol para abrir</p>
+        <h1 class="nombre-destinatario">Para Meloncito</h1>
+    </div>
+
+    <!-- PANTALLA 2: CARTA ABIERTA -->
+    <div id="pantalla-carta" class="escena oculta">
+        <div class="tarjeta-mensaje">
+            
+            <!-- Marco de emojis ajustado dentro de la tarjeta -->
+            <div class="marco-flores">
+                <!-- Borde Superior -->
+                <span class="flor-emoji f-t1">🌻</span>
+                <span class="flor-emoji f-t2">🩵</span>
+                <span class="flor-emoji f-t3">🌻</span>
+                <span class="flor-emoji f-t4">🩵</span>
+                <span class="flor-emoji f-t5">🌻</span>
+                <span class="flor-emoji f-t6">🩵</span>
+                <span class="flor-emoji f-t7">🌻</span>
+
+                <!-- Borde Derecho -->
+                <span class="flor-emoji f-r1">🩵</span>
+                <span class="flor-emoji f-r2">🌻</span>
+                <span class="flor-emoji f-r3">🩵</span>
+                <span class="flor-emoji f-r4">🌻</span>
+
+                <!-- Borde Inferior -->
+                <span class="flor-emoji f-b1">🌻</span>
+                <span class="flor-emoji f-b2">🩵</span>
+                <span class="flor-emoji f-b3">🌻</span>
+                <span class="flor-emoji f-b4">🩵</span>
+                <span class="flor-emoji f-b5">🌻</span>
+                <span class="flor-emoji f-b6">🩵</span>
+                <span class="flor-emoji f-b7">🌻</span>
+
+                <!-- Borde Izquierdo -->
+                <span class="flor-emoji f-l1">🩵</span>
+                <span class="flor-emoji f-l2">🌻</span>
+                <span class="flor-emoji f-l3">🩵</span>
+                <span class="flor-emoji f-l4">🌻</span>
+            </div>
+
+            <!-- Contenido dinámico (Texto + Foto) -->
+            <div class="contenido-layout" id="contenido-layout">
+                <div class="bloque-texto">
+                    <h2 class="titulo-nombre">Meloncito</h2>
+                    <div id="mensaje-texto" class="texto-carta"></div>
+                </div>
+
+                <!-- Foto vertical (Apunta a la imagen 1 inicialmente) -->
+                <div class="contenedor-foto">
+                    <img id="foto-carta" src="foto.jpg" alt="Foto especial" class="foto-vertical" loading="eager">
+                </div>
+            </div>
+
+            <!-- Navegación de páginas -->
+            <div class="navegacion-paginas">
+                <button id="btn-prev" class="btn-nav" aria-label="Página anterior">❮</button>
+                <span id="indicador-pagina" class="indicador-pagina">1 / 2</span>
+                <button id="btn-next" class="btn-nav" aria-label="Página siguiente">❯</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
